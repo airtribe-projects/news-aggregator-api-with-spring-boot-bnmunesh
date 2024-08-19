@@ -12,13 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RegisterController {
 
-    @Autowired
-    private UserService _userService;
-
-    @PostMapping("/register")
-    public User register(@RequestBody UserDto user) {
-        return _userService.registerUser(user);
-    }
     @GetMapping("/")
     public String home() {
         return "Hello, Welcome to news aggregator!";

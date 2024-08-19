@@ -5,9 +5,13 @@ import com.airtribe.news_aggregator_api_spring_boot.model.PreferenceDTO;
 import com.airtribe.news_aggregator_api_spring_boot.model.UserDto;
 import com.airtribe.news_aggregator_api_spring_boot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,6 +21,10 @@ public class UserServiceImpl implements UserService {
     private UserRepository _userRepository;
     @Autowired
     private PasswordEncoder _passwordEncoder;
+    @Autowired
+    private AuthenticationManager _authenticationManager;
+    @Autowired
+    private JwtService _jwtService;
 
     @Override
     public User registerUser(UserDto user) {
@@ -29,7 +37,6 @@ public class UserServiceImpl implements UserService {
     }
 
     public User updateUserPreferences(Long userId, PreferenceDTO preferencesDTO) {
-        System.out.println("Hahaha im here"+preferencesDTO);
         Optional<User> userOptional = _userRepository.findById(userId);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
@@ -38,5 +45,19 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new RuntimeException("User not found");
         }
+    }
+
+    @Override
+    public String verifyUserCredentials(UserDto user) {
+        Authentication authentication = _authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+        if (authentication.isAuthenticated()) {
+            return _jwtService.generateToken(user.getEmail());
+        }
+        return "Invalid username or password";
+    }
+
+    @Override
+    public List<User> getUsers() {
+        return _userRepository.findAll();
     }
 }
