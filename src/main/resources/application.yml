@@ -1,10 +1,14 @@
 spring:
+
+  config:
+    import: optional:secrets.properties
+
   application:
     name: news-aggregator-api-spring-boot
 
   datasource:
-    username: root
-    password: m1202@!
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     url: jdbc:mysql://localhost:3306/newsregistrationDB
     driver-class-name: com.mysql.cj.jdbc.Driver
 
@@ -16,9 +20,21 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USER}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 news:
   api:
-    key: ec123dcb779d41a1ae27dc0343edb18f
+    key: ${NEWS_ORG_API_KEY}
     url: https://newsapi.org/v2/top-headlines
 
 management:
@@ -32,5 +48,5 @@ management:
 
 security:
   jwt:
-    secretKey: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b
-    expiration-time: 28800
+    secret-key: ${JWT_SECRET_KEY}
+    expiration-time: ${JWT_EXPIRY_IN_SECONDS}

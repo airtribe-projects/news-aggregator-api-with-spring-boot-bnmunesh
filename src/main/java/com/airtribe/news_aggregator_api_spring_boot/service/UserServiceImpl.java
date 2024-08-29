@@ -1,63 +1,82 @@
 package com.airtribe.news_aggregator_api_spring_boot.service;
 
+import com.airtribe.news_aggregator_api_spring_boot.entity.Role;
 import com.airtribe.news_aggregator_api_spring_boot.entity.User;
-import com.airtribe.news_aggregator_api_spring_boot.model.PreferenceDTO;
-import com.airtribe.news_aggregator_api_spring_boot.model.UserDto;
+import com.airtribe.news_aggregator_api_spring_boot.entity.VerificationToken;
+import com.airtribe.news_aggregator_api_spring_boot.model.LoginDto;
+import com.airtribe.news_aggregator_api_spring_boot.model.UserModel;
 import com.airtribe.news_aggregator_api_spring_boot.repository.UserRepository;
+import com.airtribe.news_aggregator_api_spring_boot.repository.VerificationTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    private UserRepository _userRepository;
+    private UserRepository userRepository;
     @Autowired
-    private PasswordEncoder _passwordEncoder;
+    private VerificationTokenRepository verificationTokenRepository;
     @Autowired
-    private AuthenticationManager _authenticationManager;
+    private PasswordEncoder passwordEncoder;
     @Autowired
-    private JwtService _jwtService;
+    private AuthenticationManager authenticationManager;
 
     @Override
-    public User registerUser(UserDto user) {
-        User userEntity = new User();
-        userEntity.setEmail(user.getEmail());
-        userEntity.setPassword(_passwordEncoder.encode(user.getPassword()));
-        userEntity.setUserName(user.getUserName());
-        userEntity.setRole("USER");
-        return _userRepository.save(userEntity);
-    }
-
-    public User updateUserPreferences(Long userId, PreferenceDTO preferencesDTO) {
-        Optional<User> userOptional = _userRepository.findById(userId);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            user.setPreferences(preferencesDTO.getPreferences());
-            return _userRepository.save(user);
-        } else {
-            throw new RuntimeException("User not found");
-        }
+    public User regiserUser(UserModel user) {
+        User userEntity = User.builder()
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .password(passwordEncoder.encode(user.getPassword()))
+                .role(Role.USER)
+                .isEnabled(false)
+                .build();
+        return userRepository.save(userEntity);
     }
 
     @Override
-    public String verifyUserCredentials(UserDto user) {
-        Authentication authentication = _authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
-        if (authentication.isAuthenticated()) {
-            return _jwtService.generateToken(user.getEmail());
+    public void createVerificationToken(User userEntity, String token) {
+        VerificationToken verificationToken = new VerificationToken(token, userEntity);
+        verificationTokenRepository.save(verificationToken);
+    }
+
+    @Override
+    public boolean validateTokenAndEnableUser(String token) {
+        VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
+        if (verificationToken == null) {
+            return false;
         }
-        return "Invalid username or password";
+        if (verificationToken.getExpiryTime().getTime() > System.currentTimeMillis()) {
+            User user = verificationToken.getUser();
+            if (!user.isEnabled()) {
+                user.setEnabled(true);
+                userRepository.save(user);
+                verificationTokenRepository.delete(verificationToken);
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public User authenticateUser(LoginDto loginDto) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                loginDto.getEmail(), loginDto.getPassword()
+        ));
+        return userRepository.findByEmail(loginDto.getEmail())
+                .orElseThrow();
     }
 
     @Override
     public List<User> getUsers() {
-        return _userRepository.findAll();
+        return userRepository.findAll();
     }
 }

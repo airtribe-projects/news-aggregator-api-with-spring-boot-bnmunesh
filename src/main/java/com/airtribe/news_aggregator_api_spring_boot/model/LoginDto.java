@@ -1,18 +1,15 @@
 package com.airtribe.news_aggregator_api_spring_boot.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-public class UserModel {
-
-    private String firstName;
-    private String lastName;
+@Getter
+@Setter
+public class LoginDto {
     private String email;
     private String password;
-
 }
-

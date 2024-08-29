@@ -1,6 +1,5 @@
 package com.airtribe.news_aggregator_api_spring_boot.service;
 
-import com.airtribe.news_aggregator_api_spring_boot.entity.User;
 import com.airtribe.news_aggregator_api_spring_boot.model.UserPrincipal;
 import com.airtribe.news_aggregator_api_spring_boot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +17,11 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = _userRepository.findByEmail(email);
-        if (user == null) {
-            System.out.println("User Not Found");
-            throw new UsernameNotFoundException("user not found");
-        }
-
-        return new UserPrincipal(user);
+        return _userRepository.findByEmail(email)
+                .map(UserPrincipal::new)
+                .orElseThrow(() -> {
+                    System.out.println("User not found: "+email);
+                    return new UsernameNotFoundException("User not found with email: " +email);
+                });
     }
 }

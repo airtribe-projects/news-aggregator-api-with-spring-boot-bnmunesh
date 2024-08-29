@@ -1,17 +1,19 @@
 package com.airtribe.news_aggregator_api_spring_boot.service;
 
 import com.airtribe.news_aggregator_api_spring_boot.entity.User;
-import com.airtribe.news_aggregator_api_spring_boot.model.PreferenceDTO;
-import com.airtribe.news_aggregator_api_spring_boot.model.UserDto;
+import com.airtribe.news_aggregator_api_spring_boot.model.LoginDto;
+import com.airtribe.news_aggregator_api_spring_boot.model.UserModel;
 
 import java.util.List;
 
 public interface UserService {
-    User registerUser(UserDto user);
+    User regiserUser(UserModel user);
 
-    User updateUserPreferences(Long userId, PreferenceDTO preferencesDTO);
+    void createVerificationToken(User userEntity, String token);
 
-    String verifyUserCredentials(UserDto user);
+    boolean validateTokenAndEnableUser(String token);
+
+    User authenticateUser(LoginDto loginDto);
 
     List<User> getUsers();
 }

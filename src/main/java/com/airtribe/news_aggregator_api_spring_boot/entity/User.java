@@ -3,10 +3,7 @@ package com.airtribe.news_aggregator_api_spring_boot.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,23 +13,31 @@ import java.util.List;
 @NoArgsConstructor
 @Setter
 @Getter
+@Builder
 public class User {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @NotBlank(message = "name is mandatory")
-    private String userName;
+    @NotBlank
+    private String firstName;
+    @NotBlank(message = "name mandatory")
+    private String lastName;
 
-    @Email
+    @Email @NotBlank
     private String email;
 
+    @NotBlank
     @Column(length = 60)
     private String password;
 
-    private String role;
-//    private boolean isEnabled;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-    @ElementCollection
-    private List<String> preferences = new ArrayList<>();
+    private boolean isEnabled;
+
+//    @ElementCollection
+//    private List<String> preferences = new ArrayList<>();
+
 }
