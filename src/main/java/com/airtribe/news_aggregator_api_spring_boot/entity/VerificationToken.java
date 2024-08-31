@@ -1,5 +1,6 @@
 package com.airtribe.news_aggregator_api_spring_boot.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,6 +24,7 @@ public class VerificationToken {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name="userId")
+    @JsonIgnore
     private User user;
 
     public VerificationToken(String token, User user){

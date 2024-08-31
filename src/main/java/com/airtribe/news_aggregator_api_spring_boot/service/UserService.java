@@ -1,8 +1,10 @@
 package com.airtribe.news_aggregator_api_spring_boot.service;
 
 import com.airtribe.news_aggregator_api_spring_boot.entity.User;
+import com.airtribe.news_aggregator_api_spring_boot.entity.UserPreference;
 import com.airtribe.news_aggregator_api_spring_boot.model.LoginDto;
 import com.airtribe.news_aggregator_api_spring_boot.model.UserModel;
+import com.airtribe.news_aggregator_api_spring_boot.model.UserPreferenceDto;
 
 import java.util.List;
 
@@ -16,4 +18,7 @@ public interface UserService {
     User authenticateUser(LoginDto loginDto);
 
     List<User> getUsers();
+
+    User getUsersById(Long userId);
+
 }

@@ -1,12 +1,12 @@
 package com.airtribe.news_aggregator_api_spring_boot.entity;
 
+import com.airtribe.news_aggregator_api_spring_boot.enums.Role;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -37,7 +37,10 @@ public class User {
 
     private boolean isEnabled;
 
-//    @ElementCollection
-//    private List<String> preferences = new ArrayList<>();
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private VerificationToken verificationToken;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private UserPreference userPreference;
 
 }

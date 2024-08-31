@@ -1,10 +1,12 @@
 package com.airtribe.news_aggregator_api_spring_boot.service;
 
-import com.airtribe.news_aggregator_api_spring_boot.entity.Role;
+import com.airtribe.news_aggregator_api_spring_boot.entity.UserPreference;
+import com.airtribe.news_aggregator_api_spring_boot.enums.Role;
 import com.airtribe.news_aggregator_api_spring_boot.entity.User;
 import com.airtribe.news_aggregator_api_spring_boot.entity.VerificationToken;
 import com.airtribe.news_aggregator_api_spring_boot.model.LoginDto;
 import com.airtribe.news_aggregator_api_spring_boot.model.UserModel;
+import com.airtribe.news_aggregator_api_spring_boot.repository.UserPreferenceRepository;
 import com.airtribe.news_aggregator_api_spring_boot.repository.UserRepository;
 import com.airtribe.news_aggregator_api_spring_boot.repository.VerificationTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserPreferenceService userPreferenceService;
     @Autowired
     private VerificationTokenRepository verificationTokenRepository;
     @Autowired
@@ -56,6 +60,10 @@ public class UserServiceImpl implements UserService {
             User user = verificationToken.getUser();
             if (!user.isEnabled()) {
                 user.setEnabled(true);
+
+                UserPreference userPreference = userPreferenceService.createDefaultUserPreference(user);
+                user.setUserPreference(userPreference);
+
                 userRepository.save(user);
                 verificationTokenRepository.delete(verificationToken);
                 return true;
@@ -79,4 +87,10 @@ public class UserServiceImpl implements UserService {
     public List<User> getUsers() {
         return userRepository.findAll();
     }
+
+    @Override
+    public User getUsersById(Long userId) {
+        return userRepository.findById(userId).orElseThrow();
+    }
+
 }

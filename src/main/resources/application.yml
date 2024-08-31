@@ -34,8 +34,8 @@ spring:
 
 news:
   api:
-    key: ${NEWS_ORG_API_KEY}
-    url: https://newsapi.org/v2/top-headlines
+    key: ${NEWS_AI_API_KEY}
+    url: https://www.newsapi.ai/api/v1/article/getArticles
 
 management:
   endpoints:

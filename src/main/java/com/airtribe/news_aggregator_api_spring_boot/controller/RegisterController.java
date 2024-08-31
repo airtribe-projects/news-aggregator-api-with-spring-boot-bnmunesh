@@ -33,18 +33,18 @@ public class RegisterController {
     @PostMapping("/api/register")
     public User registerUser(@Valid @RequestBody UserModel userDTO, HttpServletRequest request) {
         User userEntity = userService.regiserUser(userDTO);
-        String jwtToken = UUID.randomUUID().toString();
-        String applicationUrl = getApplicationUrl(request) + "/verifyRegistration?jwtToken=" + jwtToken;
-        userService.createVerificationToken(userEntity, jwtToken);
-        System.out.println("Verification jwtToken created successfully for userDTO: " + userEntity.getEmail());
+        String verificationToken = UUID.randomUUID().toString();
+        String applicationUrl = getApplicationUrl(request) + "/verifyRegistration?verificationToken=" + verificationToken;
+        userService.createVerificationToken(userEntity, verificationToken);
+        System.out.println("Verification Token created successfully for userDTO: " + userEntity.getEmail());
 
 //        sending email
-        String subject = "Complete Your Registration";
-        String body = "Dear " + userEntity.getFirstName() + ",\n\n" +
-                "Thank you for registering.\nPlease click the link below to complete your registration by verifying your email. \n\n" +
-                "Link:" + applicationUrl + "\n\n" +
-                "Regards,\nMunesh";
-        emailService.sendEmail(userEntity.getEmail(), subject, body);
+//        String subject = "Complete Your Registration";
+//        String body = "Dear " + userEntity.getFirstName() + ",\n\n" +
+//                "Thank you for registering.\nPlease click the link below to complete your registration by verifying your email. \n\n" +
+//                "Link:" + applicationUrl + "\n\n" +
+//                "Regards,\nMunesh";
+//        emailService.sendEmail(userEntity.getEmail(), subject, body);
 
         System.out.println("Verification URL- " + applicationUrl + " sent to- " + userEntity.getEmail());
         return userEntity;
@@ -55,13 +55,13 @@ public class RegisterController {
     }
 
     @GetMapping("/verifyRegistration")
-    public String verifyRegistrationViaGet(@RequestParam String jwtToken) {
-        return verifyRegistration(jwtToken);
+    public String verifyRegistrationViaGet(@RequestParam String verificationToken) {
+        return verifyRegistration(verificationToken);
     }
 
     @PatchMapping("/verifyRegistration")
-    public String verifyRegistration(@RequestParam String jwtToken) {
-        boolean isValid = userService.validateTokenAndEnableUser(jwtToken);
+    public String verifyRegistration(@RequestParam String verificationToken) {
+        boolean isValid = userService.validateTokenAndEnableUser(verificationToken);
         if (isValid)
             return "User successfully verified and enabled";
         return "Invalid Token/Token Expired";

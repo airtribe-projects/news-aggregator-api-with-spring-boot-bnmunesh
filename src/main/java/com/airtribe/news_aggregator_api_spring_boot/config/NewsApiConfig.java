@@ -4,18 +4,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class ApiConfig {
+public class NewsApiConfig {
     @Value("${news.api.key}")
-    private String apiKey;
+    private String newsApiKey;
 
     @Value("${news.api.url}")
-    private String apiUrl;
+    private String newsApiUrl;
 
-    public String getApiKey() {
-        return apiKey;
+    public String getNewsApiKey() {
+        return newsApiKey;
     }
 
-    public String getApiUrl() {
-        return apiUrl;
+    public String getNewsApiUrl() {
+        return newsApiUrl;
     }
 }
