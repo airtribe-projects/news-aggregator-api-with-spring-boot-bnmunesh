@@ -22,22 +22,21 @@ public class UserPreferenceService {
     private UserPreferenceRepository userPreferenceRepository;
 
     public UserPreference getPreferencesForCurrentUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
-
-        return userPreferenceRepository.findByUser(user)
+        return userPreferenceRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Preferences not found for user ID: " + userId));
     }
 
 
     public UserPreference updatePreferencesForCurrentUser(Long userId, UserPreferenceDto userPreferenceDto) {
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
-        UserPreference userPreference = user.getUserPreference();
-        if(userPreference == null){
-            System.out.println("User "+userId+" does not have a preference. Creating a default one.");
-            userPreference =  createDefaultUserPreference(user);
-        }
+
+        UserPreference userPreference = userPreferenceRepository.findByUser(user)
+                .orElseGet(() -> {
+                    System.out.println("UserPreference not found for user ID: " + userId+". Creating a default one.");
+                    return createDefaultUserPreference(user);
+                });
 
         // Update categories if provided
         if (userPreferenceDto.getCategories() != null) {

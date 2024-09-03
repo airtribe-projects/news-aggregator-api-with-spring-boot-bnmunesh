@@ -1,21 +1,27 @@
 package com.airtribe.news_aggregator_api_spring_boot.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class NewsApiConfig {
-    @Value("${news.api.key}")
-    private String newsApiKey;
 
-    @Value("${news.api.url}")
-    private String newsApiUrl;
-
-    public String getNewsApiKey() {
-        return newsApiKey;
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 
-    public String getNewsApiUrl() {
-        return newsApiUrl;
+    @Bean
+    public WebClient webClient() {
+        return WebClient.builder()
+                .exchangeStrategies(ExchangeStrategies.builder()
+                        .codecs(configurer -> configurer
+                                .defaultCodecs()
+                                .maxInMemorySize(10 * 1024 * 1024))
+                        .build())
+                .build();
     }
 }
