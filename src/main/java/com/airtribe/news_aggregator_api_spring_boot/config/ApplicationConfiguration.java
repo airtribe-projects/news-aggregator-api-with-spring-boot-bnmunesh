@@ -23,7 +23,7 @@ public class ApplicationConfiguration {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/register", "/verifyRegistration", "/api/login").permitAll()
+                        .requestMatchers("/api/register", "/verifyRegistration", "/api/login","/api/v1/news").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->

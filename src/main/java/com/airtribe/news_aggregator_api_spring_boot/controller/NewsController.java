@@ -7,11 +7,13 @@ import com.airtribe.news_aggregator_api_spring_boot.model.apiresponse.NewsApiRes
 import com.airtribe.news_aggregator_api_spring_boot.service.NewsApiRequestBuilder;
 import com.airtribe.news_aggregator_api_spring_boot.service.NewsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+
 
 @RestController
 public class NewsController {
@@ -30,11 +32,22 @@ public class NewsController {
     }
 
     @PostMapping("api/v1/news")
-    public Mono<String> getNews(Authentication authentication) {
+    public Mono<ResponseEntity<String>> getNews(Authentication authentication) {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         User user = userPrincipal.getUser();
         String requestBody = newsApiRequestBuilder.buildRequestBody(user.getUserId());
-        return newsService.getNews(requestBody);
+        return newsService.getNews(requestBody)
+                .map(ResponseEntity::ok);
+    }
+
+    @PostMapping("api/v1/newsNoRest")
+    public Mono<NewsApiResponse> newsNoRest(Authentication authentication) {
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        User user = userPrincipal.getUser();
+        String requestBody = newsApiRequestBuilder.buildRequestBody(user.getUserId());
+        Mono<NewsApiResponse> res= newsService.newsNoRest(requestBody);
+        System.out.println("responseBody: " + res);
+        return res;
     }
 
     @PostMapping("api/v2/news")
@@ -47,13 +60,4 @@ public class NewsController {
         return response;
     }
 
-    @PostMapping("api/v3/news")
-    public String getNewsR(Authentication authentication) {
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        User user = userPrincipal.getUser();
-        String requestBody = newsApiRequestBuilder.buildRequestBody(user.getUserId());
-        String response = newsService.getNewsR(requestBody);
-        System.out.println("responseBody: \n" + response);
-        return response;
-    }
 }
