@@ -31,26 +31,8 @@ public class NewsController {
         return newsApiRequestBuilder.buildRequestBody(user.getUserId());
     }
 
+    //Synchronous RestTemplate api call
     @PostMapping("api/v1/news")
-    public Mono<ResponseEntity<String>> getNews(Authentication authentication) {
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        User user = userPrincipal.getUser();
-        String requestBody = newsApiRequestBuilder.buildRequestBody(user.getUserId());
-        return newsService.getNews(requestBody)
-                .map(ResponseEntity::ok);
-    }
-
-    @PostMapping("api/v1/newsNoRest")
-    public Mono<NewsApiResponse> newsNoRest(Authentication authentication) {
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        User user = userPrincipal.getUser();
-        String requestBody = newsApiRequestBuilder.buildRequestBody(user.getUserId());
-        Mono<NewsApiResponse> res= newsService.newsNoRest(requestBody);
-        System.out.println("responseBody: " + res);
-        return res;
-    }
-
-    @PostMapping("api/v2/news")
     public NewsApiResponse getNewsRest(Authentication authentication) {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         User user = userPrincipal.getUser();
@@ -60,4 +42,23 @@ public class NewsController {
         return response;
     }
 
+    //Asynchronous WebClient api call
+    @PostMapping("api/v2/news")
+    public Mono<ResponseEntity<String>> getNews(Authentication authentication) {
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        User user = userPrincipal.getUser();
+        String requestBody = newsApiRequestBuilder.buildRequestBody(user.getUserId());
+        return newsService.getNews(requestBody)
+                .map(ResponseEntity::ok);
+    }
+
+    @PostMapping("api/v2/news1")
+    public Mono<NewsApiResponse> getNews1(Authentication authentication) {
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        User user = userPrincipal.getUser();
+        String requestBody = newsApiRequestBuilder.buildRequestBody(user.getUserId());
+        Mono<NewsApiResponse> res= newsService.getNews1(requestBody);
+        System.out.println("responseBody: " + res);
+        return res;
+    }
 }

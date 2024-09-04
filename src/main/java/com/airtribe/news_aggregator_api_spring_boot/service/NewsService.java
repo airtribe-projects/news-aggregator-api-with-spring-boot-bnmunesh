@@ -20,48 +20,9 @@ public class NewsService {
     @Autowired
     private ObjectMapper objectMapper;
 
-
-    public Mono<String> getNews(String requestBody) {
-
-            Mono<String> response = webClient.post()
-                    .uri(BASE_URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(requestBody)
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .onErrorResume(error -> {
-                        System.err.println("Error fetching news: " + error.getMessage());
-                        return Mono.just("Error fetching news");
-                    });
-            return response;
-    }
-
-    public Mono<NewsApiResponse> newsNoRest(String requestBody) {
-        try {
-            Mono<NewsApiResponse> response = webClient.post()
-                    .uri(BASE_URL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(requestBody)
-                    .retrieve()
-                    .bodyToMono(NewsApiResponse.class)
-                    .onErrorResume(error -> {
-                        System.err.println("Error fetching news: " + error.getMessage());
-                        return Mono.error(error);
-                    });
-            return response;
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-
-
-
     public NewsApiResponse getNewsRest(String requestBody) {
         try {
-            var httpHeaders = new HttpHeaders();
+            HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<String> entity = new HttpEntity<>(requestBody, httpHeaders);
             ResponseEntity<String> responseBody = restTemplate.exchange(
@@ -77,8 +38,36 @@ public class NewsService {
             e.printStackTrace();
             return null;
         }
+    }
 
+    public Mono<String> getNews(String requestBody) {
+            Mono<String> response = webClient.post()
+                    .uri(BASE_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .doOnNext(apiResponse -> System.out.println("Raw Response Length: " +apiResponse.length()))
+                    .onErrorResume(error -> {
+                        System.err.println("Error fetching news: " + error.getMessage());
+                        return Mono.just("Error fetching news");
+                    });
+            return response;
+    }
 
+    public Mono<NewsApiResponse> getNews1(String requestBody) {
+            Mono<NewsApiResponse> response = webClient.post()
+                    .uri(BASE_URL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(requestBody)
+                    .retrieve()
+                    .bodyToMono(NewsApiResponse.class)
+                    .doOnNext(apiResponse -> System.out.println("Raw Response Length: " +apiResponse.getArticles().getTotalResults()))
+                    .onErrorResume(error -> {
+                        System.err.println("Error fetching news: " + error.getMessage());
+                        return Mono.error(error);
+                    });
+            return response;
     }
 }
 

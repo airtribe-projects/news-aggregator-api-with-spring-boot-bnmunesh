@@ -18,7 +18,8 @@ import java.util.Set;
 @Component
 public class NewsApiRequestBuilder {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
     @Autowired
     private UserPreferenceRepository userPreferenceRepository;
 
